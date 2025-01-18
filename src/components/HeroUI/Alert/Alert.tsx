@@ -4,9 +4,9 @@ import {Alert, Button} from "@heroui/react";
 export default function PassSubmitAlert() {
   const [isVisible, setIsVisible] = React.useState(true);
 
-  const title = "Success Notification";
+  const title = "Pass Created Successfully";
   const description =
-    "Your action has been completed successfully. We'll notify you when updates are available.";
+    "You have successfully created a pass for your visitor. The pass has been sent to the visitor's email address / phone.";
 
   return (
     <div className="flex flex-col gap-4">

@@ -104,19 +104,21 @@ export default function CreateVisitorsPass() {
             }}
           />
 
+          {/* Phone Number Input */}
           <Input
             isRequired
-            errorMessage="Please enter a valid email"
-            label="Email"
+            errorMessage="Please enter phone number"
+            label="Phone Number"
             labelPlacement="outside"
-            name="email"
-            placeholder="Enter your email"
-            type="email"
+            name="phone"
+            placeholder="Enter your phone number"
+            type="number"
             onChange={(e) => {
-              setFormData({ ...formData, email: e.target.value });
+              setFormData({ ...formData, phone: e.target.value });
             }}
           />
 
+          
           <Input
             isRequired
             errorMessage="Please enter address"
@@ -146,29 +148,25 @@ export default function CreateVisitorsPass() {
             }}
           />
 
-          {/* Phone Number Input */}
-          <Input
-            isRequired
-            errorMessage="Please enter phone number"
-            label="Phone Number"
+        <Input
+            errorMessage="Please enter a valid email"
+            label="Email"
             labelPlacement="outside"
-            name="phone"
-            placeholder="Enter your phone number"
-            type="number"
+            name="email"
+            placeholder="Enter your email"
+            type="email"
             onChange={(e) => {
-              setFormData({ ...formData, phone: e.target.value });
+              setFormData({ ...formData, email: e.target.value });
             }}
           />
 
-          <div className="flex flex-col gap-y-2">
-            <p className="w-full max-w-xs flex flex-col gap-4 mb-2">
-              Visitors Timing is 8:00 AM to 7:00 PM
-            </p>
 
+          <div className="flex flex-col gap-y-2">
             <DateRangePicker
               isRequired
               value={formData.dateRange}
-              label="Please Select Pass validity"
+              label="Please Select Dates. Timing is 8:00 AM to 7:00 PM"
+              labelPlacement="outside"
               errorMessage="Please select a date range"
               onChange={(range) => {
                 if (range) {
@@ -180,7 +178,7 @@ export default function CreateVisitorsPass() {
         </div>
 
         {/* Create Pass and Reset buttons */}
-        <div className="col-span-2 flex gap-4 justify-center mt-6">
+        <div className="col-span-2 flex gap-4 justify-center">
           <Button color="primary" type="submit">
             Create Pass
           </Button>
