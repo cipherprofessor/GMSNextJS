@@ -20,9 +20,7 @@ export default function PassSubmitAlert() {
           onClose={() => setIsVisible(false)}
         />
       ) : (
-        <Button variant="bordered" onPress={() => setIsVisible(true)}>
-          Show Alert
-        </Button>
+        <></>
       )}
     </div>
   );

@@ -4,8 +4,7 @@ import { parseDate } from "@internationalized/date";
 import { Form, Input, Button } from "@heroui/react";
 import axios from "axios";
 import PassSubmitAlert from "../Alert/Alert";  // Import your alert component
-import FailAlert from "../Alert/FailAlerts";
-// Assuming you have a FailAlert component for errors
+import FailAlert from "../Alert/FailAlerts";  // Assuming you have a FailAlert component for errors
 
 export default function CreateVisitorsPass() {
   const [formData, setFormData] = useState({
@@ -28,11 +27,11 @@ export default function CreateVisitorsPass() {
     e.preventDefault();
 
     // Basic validation
-    if (!formData.name || !formData.email || !formData.address || !formData.phone) {
-      console.error("Missing required fields.");
-      setActionMessage("Please fill in all required fields.");
-      return;
-    }
+    // if (!formData.name || !formData.email || !formData.address || !formData.phone) {
+    //   console.error("Missing required fields.");
+    //   setActionMessage("Please fill in all required fields.");
+    //   return;
+    // }
 
     try {
       // Prepare data for submission
@@ -85,9 +84,7 @@ export default function CreateVisitorsPass() {
       <Form
         className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-6"
         validationBehavior="native"
-        onSubmit={(e) => {
-          handleSubmit(e);
-        }}
+        onSubmit={(e) => handleSubmit(e)}  // Ensure form submit triggers handleSubmit
       >
         {/* Left side form inputs */}
         <div className="flex flex-col gap-4">
@@ -99,6 +96,7 @@ export default function CreateVisitorsPass() {
             name="name"
             placeholder="Enter visitors name"
             type="text"
+            value={formData.name}
             onChange={(e) => {
               setFormData({ ...formData, name: e.target.value });
             }}
@@ -113,12 +111,12 @@ export default function CreateVisitorsPass() {
             name="phone"
             placeholder="Enter your phone number"
             type="number"
+            value={formData.phone}
             onChange={(e) => {
               setFormData({ ...formData, phone: e.target.value });
             }}
           />
 
-          
           <Input
             isRequired
             errorMessage="Please enter address"
@@ -127,6 +125,7 @@ export default function CreateVisitorsPass() {
             name="address"
             placeholder="Please enter visitor's address"
             type="text"
+            value={formData.address}
             onChange={(e) => {
               setFormData({ ...formData, address: e.target.value });
             }}
@@ -143,23 +142,24 @@ export default function CreateVisitorsPass() {
             name="reason"
             placeholder="Please add reason"
             type="text"
+            value={formData.reason}
             onChange={(e) => {
               setFormData({ ...formData, reason: e.target.value });
             }}
           />
 
-        <Input
+          <Input
             errorMessage="Please enter a valid email"
             label="Email"
             labelPlacement="outside"
             name="email"
             placeholder="Enter your email"
             type="email"
+            value={formData.email}
             onChange={(e) => {
               setFormData({ ...formData, email: e.target.value });
             }}
           />
-
 
           <div className="flex flex-col gap-y-2">
             <DateRangePicker
@@ -185,13 +185,14 @@ export default function CreateVisitorsPass() {
           <Button
             type="reset"
             variant="flat"
-            onPress={() => {
+            onClick={() => {
+              // Reset form to initial state
               setFormData({
                 name: "",
                 email: "",
                 address: "",
                 reason: "",
-                phone: "", 
+                phone: "",
                 dateRange: {
                   start: parseDate("2025-01-01"),
                   end: parseDate("2025-01-08"),
