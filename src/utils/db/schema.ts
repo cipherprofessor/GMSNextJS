@@ -70,7 +70,8 @@ export const VisitorsPasses = pgTable("visitorspasses", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 100 }).notNull(),
   email: varchar("email", { length: 100 }).notNull(),
-  date: timestamp("date").defaultNow().notNull(),
+  dateStart: timestamp("date_start").notNull(),  // Rename to 'dateStart'
+  dateEnd: timestamp("date_end").notNull(),  // Rename to 'dateEnd'
   reason: text("reason").notNull(),
   address: text("address").notNull(),
 });
