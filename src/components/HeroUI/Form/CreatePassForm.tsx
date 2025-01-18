@@ -11,7 +11,7 @@ export default function CreateVisitorsPass() {
     email: "",
     address: "",
     reason: "",
-    phone: "",
+    phone: "",  // Added phone field
     dateRange: {
       start: parseDate("2025-01-01"),
       end: parseDate("2025-01-08"),
@@ -25,7 +25,7 @@ export default function CreateVisitorsPass() {
     e.preventDefault();
 
     // Basic validation
-    if (!formData.name || !formData.email || !formData.address) {
+    if (!formData.name || !formData.email || !formData.address || !formData.phone) {
       console.error("Missing required fields.");
       setActionMessage("Please fill in all required fields.");
       return;
@@ -38,6 +38,7 @@ export default function CreateVisitorsPass() {
         email: formData.email,
         address: formData.address,
         reason: formData.reason,
+        phone: formData.phone,  // Added phone to the post data
         date: {
           start: formData.dateRange.start.toString(),
           end: formData.dateRange.end.toString(),
@@ -48,7 +49,7 @@ export default function CreateVisitorsPass() {
       const response = await axios.post("/api/create-pass", postData);
 
       if (response.status === 200) {
-        setActionMessage("Pass created successfully!");
+        // setActionMessage("Pass created successfully!");
         setIsAlertVisible(true); // Show the alert on success
       } else {
         console.error("API call failed with status:", response.status);
@@ -134,7 +135,7 @@ export default function CreateVisitorsPass() {
             labelPlacement="outside"
             name="phone"
             placeholder="Enter your phone number"
-            type="text"
+            type="number"
             onChange={(e) => {
               setFormData({ ...formData, phone: e.target.value });
             }}
@@ -173,7 +174,7 @@ export default function CreateVisitorsPass() {
                 email: "",
                 address: "",
                 reason: "",
-                phone: "",
+                phone: "", // Reset phone number as well
                 dateRange: {
                   start: parseDate("2025-01-01"),
                   end: parseDate("2025-01-08"),

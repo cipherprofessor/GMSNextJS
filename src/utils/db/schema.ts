@@ -65,10 +65,10 @@ export const Transactions = pgTable("transactions", {
   date: timestamp("date").defaultNow().notNull(),
 });
 
-// VisitorsPasses table
 export const VisitorsPasses = pgTable("visitorspasses", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 100 }).notNull(),
+  phone: varchar("phone", { length: 20 }).notNull(), // Added phone field
   email: varchar("email", { length: 100 }).notNull(),
   dateStart: timestamp("date_start").notNull(),  // Rename to 'dateStart'
   dateEnd: timestamp("date_end").notNull(),  // Rename to 'dateEnd'

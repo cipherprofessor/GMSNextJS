@@ -7,7 +7,7 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method === "POST") {
-    const { name, email, address, reason, date } = req.body;
+    const { name, email, address, reason,phone, date } = req.body;
 
     // Convert date fields to Date objects
     const startDate = new Date(date.start);
@@ -23,6 +23,7 @@ export default async function handler(
         email,
         address,
         reason,
+        phone,
         dateStart: startDate,  // Store the start date
         dateEnd: endDate,  // Store the end date
       });
