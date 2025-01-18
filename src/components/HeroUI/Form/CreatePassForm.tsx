@@ -4,6 +4,8 @@ import { parseDate } from "@internationalized/date";
 import { Form, Input, Button } from "@heroui/react";
 import axios from "axios";
 import PassSubmitAlert from "../Alert/Alert";  // Import your alert component
+import FailAlert from "../Alert/FailAlerts";
+// Assuming you have a FailAlert component for errors
 
 export default function CreateVisitorsPass() {
   const [formData, setFormData] = useState({
@@ -11,7 +13,7 @@ export default function CreateVisitorsPass() {
     email: "",
     address: "",
     reason: "",
-    phone: "",  // Added phone field
+    phone: "",
     dateRange: {
       start: parseDate("2025-01-01"),
       end: parseDate("2025-01-08"),
@@ -19,7 +21,8 @@ export default function CreateVisitorsPass() {
   });
 
   const [actionMessage, setActionMessage] = useState("");
-  const [isAlertVisible, setIsAlertVisible] = useState(false);  // For controlling alert visibility
+  const [isAlertVisible, setIsAlertVisible] = useState(false);  // For success alert
+  const [isFailAlertVisible, setIsFailAlertVisible] = useState(false);  // For failure alert
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +41,7 @@ export default function CreateVisitorsPass() {
         email: formData.email,
         address: formData.address,
         reason: formData.reason,
-        phone: formData.phone,  // Added phone to the post data
+        phone: formData.phone,
         date: {
           start: formData.dateRange.start.toString(),
           end: formData.dateRange.end.toString(),
@@ -48,16 +51,32 @@ export default function CreateVisitorsPass() {
       // Make the API call
       const response = await axios.post("/api/create-pass", postData);
 
-      if (response.status === 200) {
-        // setActionMessage("Pass created successfully!");
-        setIsAlertVisible(true); // Show the alert on success
+      if (response.status >= 200 && response.status < 300) {
+        // Success: Reset form data and show success alert
+        setFormData({
+          name: "",
+          email: "",
+          address: "",
+          reason: "",
+          phone: "",
+          dateRange: {
+            start: parseDate("2025-01-01"),
+            end: parseDate("2025-01-08"),
+          },
+        });
+
+        setIsAlertVisible(true);  // Show success alert
+        setIsFailAlertVisible(false); // Hide failure alert
       } else {
-        console.error("API call failed with status:", response.status);
-        setActionMessage("Failed to create pass. Please try again.");
+        // Failure: Show failure alert
+        setIsFailAlertVisible(true);
+        setIsAlertVisible(false);
       }
     } catch (error) {
       console.error("Error submitting form:", error);
-      setActionMessage("Failed to create pass. Please try again.");
+      // Failure: Show failure alert
+      setIsFailAlertVisible(true);
+      setIsAlertVisible(false);
     }
   };
 
@@ -174,7 +193,7 @@ export default function CreateVisitorsPass() {
                 email: "",
                 address: "",
                 reason: "",
-                phone: "", // Reset phone number as well
+                phone: "", 
                 dateRange: {
                   start: parseDate("2025-01-01"),
                   end: parseDate("2025-01-08"),
@@ -187,7 +206,8 @@ export default function CreateVisitorsPass() {
         </div>
       </Form>
 
-      {isAlertVisible && <PassSubmitAlert />}  {/* Show alert when API call succeeds */}
+      {isAlertVisible && <PassSubmitAlert />}  {/* Show success alert */}
+      {isFailAlertVisible && <FailAlert />}    {/* Show failure alert */}
 
       {actionMessage && (
         <p className="mt-4 text-sm text-center">

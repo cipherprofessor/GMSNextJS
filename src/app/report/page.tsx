@@ -1,6 +1,7 @@
 'use client'
 import CreatePassForm from '@/components/HeroUI/Form/CreatePassForm';
 import HeroUIDateRangePicker from '@/components/HeroUI/DateFromTo/DateFromTo';
+import FailAlert from '@/components/HeroUI/Alert/FailAlerts';
 
 
 export default function ReportPage() {
@@ -16,6 +17,7 @@ export default function ReportPage() {
         {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8"> */}
           <div >
             <CreatePassForm />
+            {/* <FailAlert /> */}
           {/* </div> */}
         </div>
       </div>
