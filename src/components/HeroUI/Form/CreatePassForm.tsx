@@ -76,27 +76,7 @@ export default function CreateVisitorsPass() {
 
   return (
     <div className="flex flex-col gap-6">
-      <p className="w-full max-w-xs mb-2">
-        Visitors Timing is 8:00 AM to 7:00 PM
-      </p>
-      <DateRangePicker
-        isRequired
-        label="Please Select Pass Validity"
-        errorMessage="Please select a date range"
-        value={formData.dateRange}
-        onChange={(newValue) => {
-          if (newValue) {
-            setFormData({ ...formData, dateRange: newValue });
-            console.log("Updated date range:", newValue);
-          }
-        }}
-      />
-      <p className="text-default-500 text-sm mt-3">
-        Selected date: {formatter.formatRange(
-          formData.dateRange.start.toDate(getLocalTimeZone()),
-          formData.dateRange.end.toDate(getLocalTimeZone())
-        )}
-      </p>
+      
       <Form
         className="w-full max-w-xs flex flex-col gap-4"
         validationBehavior="native"
