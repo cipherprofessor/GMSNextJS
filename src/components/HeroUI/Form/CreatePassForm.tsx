@@ -11,6 +11,7 @@ export default function CreateVisitorsPass() {
     email: "",
     address: "",
     reason: "",
+    phone: "",
     dateRange: {
       start: parseDate("2025-01-01"),
       end: parseDate("2025-01-08"),
@@ -62,95 +63,104 @@ export default function CreateVisitorsPass() {
   return (
     <div className="flex flex-col gap-6">
       <Form
-        className="w-full max-w-xs flex flex-col gap-4"
+        className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-6"
         validationBehavior="native"
         onSubmit={(e) => {
           handleSubmit(e);
         }}
       >
-        <div className="flex flex-col gap-4"> 
-                    <div className="w-full max-w-xs flex flex-col gap-4">
-        <Input
-          isRequired
-          errorMessage="Please enter a name"
-          label="Visitors Name"
-          labelPlacement="outside"
-          name="name"
-          placeholder="Enter visitors name"
-          type="text"
-          onChange={(e) => {
-            setFormData({ ...formData, name: e.target.value });
-          }}
-        />
-
-        <Input
-          isRequired
-          errorMessage="Please enter a valid email"
-          label="Email"
-          labelPlacement="outside"
-          name="email"
-          placeholder="Enter your email"
-          type="email"
-          onChange={(e) => {
-            setFormData({ ...formData, email: e.target.value });
-          }}
-        />
-
-        <Input
-          isRequired
-          errorMessage="Please enter address"
-          label="Address"
-          labelPlacement="outside"
-          name="address"
-          placeholder="Please enter visitor's address"
-          type="text"
-          onChange={(e) => {
-            setFormData({ ...formData, address: e.target.value });
-          }}
-        />
-                  </div>
-
-                  <div className="w-full max-w-xs flex flex-col gap-4">
-
-        {/* Single Reason Of Visit Field */}
-        <Input
-          isRequired
-          errorMessage="Please add reason"
-          label="Reason Of Visit"
-          labelPlacement="outside"
-          name="reason"
-          placeholder="Please add reason"
-          type="text"
-          onChange={(e) => {
-            setFormData({ ...formData, reason: e.target.value });
-          }}
-        />
-
-        {/* Date Range Picker - only one instance */}
-        <div className="flex flex-row gap-2">
-      <div className="w-full flex flex-col gap-y-2 ">
-        <p className="w-full max-w-xs flex flex-col gap-4 mb-2">
-            Visitors Timing is 8:00 AM to 7:00 PM
-        </p>
-
-          <DateRangePicker
+        {/* Left side form inputs */}
+        <div className="flex flex-col gap-4">
+          <Input
             isRequired
-            value={formData.dateRange}
-            label="Please Select Pass validity"
-            errorMessage="Please select a date range"
-            onChange={(range) => {
-              if (range) {
-                setFormData({ ...formData, dateRange: range });
-              }
+            errorMessage="Please enter a name"
+            label="Visitors Name"
+            labelPlacement="outside"
+            name="name"
+            placeholder="Enter visitors name"
+            type="text"
+            onChange={(e) => {
+              setFormData({ ...formData, name: e.target.value });
+            }}
+          />
+
+          <Input
+            isRequired
+            errorMessage="Please enter a valid email"
+            label="Email"
+            labelPlacement="outside"
+            name="email"
+            placeholder="Enter your email"
+            type="email"
+            onChange={(e) => {
+              setFormData({ ...formData, email: e.target.value });
+            }}
+          />
+
+          <Input
+            isRequired
+            errorMessage="Please enter address"
+            label="Address"
+            labelPlacement="outside"
+            name="address"
+            placeholder="Please enter visitor's address"
+            type="text"
+            onChange={(e) => {
+              setFormData({ ...formData, address: e.target.value });
             }}
           />
         </div>
+
+        {/* Right side form inputs */}
+        <div className="flex flex-col gap-4">
+          <Input
+            isRequired
+            errorMessage="Please add reason"
+            label="Reason Of Visit"
+            labelPlacement="outside"
+            name="reason"
+            placeholder="Please add reason"
+            type="text"
+            onChange={(e) => {
+              setFormData({ ...formData, reason: e.target.value });
+            }}
+          />
+
+          {/* Phone Number Input */}
+          <Input
+            isRequired
+            errorMessage="Please enter phone number"
+            label="Phone Number"
+            labelPlacement="outside"
+            name="phone"
+            placeholder="Enter your phone number"
+            type="text"
+            onChange={(e) => {
+              setFormData({ ...formData, phone: e.target.value });
+            }}
+          />
+
+          <div className="flex flex-col gap-y-2">
+            <p className="w-full max-w-xs flex flex-col gap-4 mb-2">
+              Visitors Timing is 8:00 AM to 7:00 PM
+            </p>
+
+            <DateRangePicker
+              isRequired
+              value={formData.dateRange}
+              label="Please Select Pass validity"
+              errorMessage="Please select a date range"
+              onChange={(range) => {
+                if (range) {
+                  setFormData({ ...formData, dateRange: range });
+                }
+              }}
+            />
+          </div>
         </div>
 
-        </div>
-                </div>
-
-        <div className="flex gap-2 mt-4">
+        {/* Create Pass and Reset buttons */}
+        <div className="col-span-2 flex gap-4 justify-center mt-6">
           <Button color="primary" type="submit">
             Create Pass
           </Button>
@@ -163,6 +173,7 @@ export default function CreateVisitorsPass() {
                 email: "",
                 address: "",
                 reason: "",
+                phone: "",
                 dateRange: {
                   start: parseDate("2025-01-01"),
                   end: parseDate("2025-01-08"),
