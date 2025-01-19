@@ -11,24 +11,16 @@
   margin: 2px;
 }
 
-// .signupmainScreenSignup{
-//   display: flex;
-//   background-color: transparent;
-//   height: 94vh;
-//   width: 100%;
-// }
-
 .signupleftSide{
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  padding:  30px 20px 20px 20px;
   // background: white;
   // padding: 2rem;
 
   .signupgoToLogintext{
-    color: #ffffff;
     font-size: 1.5rem;
     font-weight: 600;
     margin:10px;
@@ -38,7 +30,6 @@
   }
 
   .signupgoToSignuptext{
-    color: #ffffff;
     font-size: 1.5rem;
     font-weight: 600;
     margin:10px;
@@ -54,8 +45,9 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  
+  padding: 34px 20px 20px 20px;
   // padding: 2rem;
   // box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 
@@ -63,6 +55,7 @@
     width: 100%;
     padding: 2rem;
     border-radius: 8px;
+    background-image: linear-gradient(to top, #cfd9df 0%, #e2ebf0 100%);
     // box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
 
@@ -70,7 +63,6 @@
     display: flex;
     flex-direction: column;
     margin-bottom: 1.5rem;
-    color: #fbfbfb;
     align-items: center;
     justify-content: center;
     width: 100%; 
@@ -79,7 +71,6 @@
       font-size: 1.5rem;
       font-weight: 600;
       margin-bottom: 1rem;
-      color: #ffffff;
       // white-space: pre-wrap;
       text-align: center; 
       width: 100%; 
@@ -89,7 +80,6 @@
       font-size: 1rem;
       font-weight: 400;
       margin-bottom: 1rem;
-      color: #fffbfb;
       // white-space: pre-wrap;
       text-align: center; 
       width: 100%; 

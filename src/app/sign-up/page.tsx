@@ -6,6 +6,8 @@ import Link from "next/link";
 import styles from "./SignupPageClerk.module.scss";
 // import { authConstants } from "../../../components/MyFigma/LoginSignupFigma/authConstants";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import Image from "next/image";
+import GatePassImage from "../../../public/GPMSLanding.png";
 
 const SignUpPageClerk: React.FC = () => {
   const { isSignedIn, isLoaded } = useUser();
@@ -52,10 +54,10 @@ const SignUpPageClerk: React.FC = () => {
             </div>
           </div>
           <div className={styles.signupmainImageRight}>
-            <img
-              src="https://www.endeavourweigh.com/wp-content/uploads/2024/03/Rto1.png"
-              alt="MainImage"
-              className={styles.signupmainImageRight}
+          <Image
+              src={GatePassImage}
+              alt="Gate Pass Management System"
+              className={styles.loginmainImageRight}
             />
           </div>
         </div>
