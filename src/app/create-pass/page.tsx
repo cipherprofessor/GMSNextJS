@@ -11,14 +11,9 @@ export default function ReportPage() {
       <h1 className="text-3xl font-semibold mb-6 mt-10 text-gray-800 text-center">Create A Pass</h1>
 
       <div className="bg-white p-8 rounded-2xl shadow-lg mb-12 mt-2">
-
-
-
-        {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8"> */}
           <div >
             <CreatePassForm />
-            {/* <FailAlert /> */}
-          {/* </div> */}
+           
         </div>
       </div>
     </div>

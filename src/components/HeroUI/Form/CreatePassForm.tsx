@@ -22,16 +22,11 @@ export default function CreateVisitorsPass() {
   const [actionMessage, setActionMessage] = useState("");
   const [isAlertVisible, setIsAlertVisible] = useState(false);  // For success alert
   const [isFailAlertVisible, setIsFailAlertVisible] = useState(false);  // For failure alert
+  const [isLoading, setIsLoading] = useState(false);  // For loading state
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Basic validation
-    // if (!formData.name || !formData.email || !formData.address || !formData.phone) {
-    //   console.error("Missing required fields.");
-    //   setActionMessage("Please fill in all required fields.");
-    //   return;
-    // }
+    setIsLoading(true);  // Start loading
 
     try {
       // Prepare data for submission
@@ -64,18 +59,34 @@ export default function CreateVisitorsPass() {
           },
         });
 
-        setIsAlertVisible(true);  // Show success alert
-        setIsFailAlertVisible(false); // Hide failure alert
+        setIsAlertVisible(true);  
+        setIsFailAlertVisible(false); 
+
+        // Hide success alert after 5 seconds
+        setTimeout(() => {
+          setIsAlertVisible(false);
+        }, 4000);
       } else {
-        // Failure: Show failure alert
         setIsFailAlertVisible(true);
         setIsAlertVisible(false);
+
+        // Hide failure alert after 5 seconds
+        setTimeout(() => {
+          setIsFailAlertVisible(false);
+        }, 5000);
       }
     } catch (error) {
       console.error("Error submitting form:", error);
-      // Failure: Show failure alert
+      
       setIsFailAlertVisible(true);
       setIsAlertVisible(false);
+
+      // Hide failure alert after 5 seconds
+      setTimeout(() => {
+        setIsFailAlertVisible(false);
+      }, 5000);
+    } finally {
+      setIsLoading(false);  // Stop loading
     }
   };
 
@@ -84,7 +95,7 @@ export default function CreateVisitorsPass() {
       <Form
         className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-6"
         validationBehavior="native"
-        onSubmit={(e) => handleSubmit(e)}  // Ensure form submit triggers handleSubmit
+        onSubmit={(e) => handleSubmit(e)}  
       >
         {/* Left side form inputs */}
         <div className="flex flex-col gap-4">
@@ -179,13 +190,13 @@ export default function CreateVisitorsPass() {
 
         {/* Create Pass and Reset buttons */}
         <div className="col-span-2 flex gap-4 justify-center">
-          <Button color="primary" type="submit">
-            Create Pass
+          <Button color="primary" type="submit" isDisabled={isLoading}>
+            {isLoading ? "Creating..." : "Create Pass"}
           </Button>
           <Button
             type="reset"
             variant="flat"
-            onClick={() => {
+            onPress={() => {
               // Reset form to initial state
               setFormData({
                 name: "",
@@ -205,8 +216,8 @@ export default function CreateVisitorsPass() {
         </div>
       </Form>
 
-      {isAlertVisible && <PassSubmitAlert />}  {/* Show success alert */}
-      {isFailAlertVisible && <FailAlert />}    {/* Show failure alert */}
+      {isAlertVisible && <PassSubmitAlert />} 
+      {isFailAlertVisible && <FailAlert />}   
 
       {actionMessage && (
         <p className="mt-4 text-sm text-center">
