@@ -321,7 +321,63 @@ export default function VisitorTable() {
   }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
 
   if (isLoading) {
-    return <div>Loading passes...</div>;
+    return (
+      <div className="w-full">
+        {/* Skeleton Top Content */}
+        <div className="flex flex-col gap-4 mb-4">
+          <div className="flex justify-between gap-3 items-end">
+            <div className="w-[44%] h-10 bg-default-200 rounded-lg animate-pulse" />
+            <div className="flex gap-3">
+              <div className="w-24 h-10 bg-default-200 rounded-lg animate-pulse" />
+              <div className="w-32 h-10 bg-primary-100 rounded-lg animate-pulse" />
+            </div>
+          </div>
+        </div>
+
+        {/* Skeleton Table */}
+        <div className="w-full border rounded-lg overflow-hidden">
+          {/* Header */}
+          <div className="flex bg-default-100 h-12 items-center px-4 border-b">
+            {INITIAL_VISIBLE_COLUMNS.map((_, index) => (
+              <div 
+                key={index}
+                className="flex-1 h-4 bg-default-200 rounded animate-pulse mr-4"
+              />
+            ))}
+          </div>
+
+          {/* Rows */}
+          {[...Array(5)].map((_, rowIndex) => (
+            <div 
+              key={rowIndex}
+              className="flex items-center h-16 px-4 border-b last:border-b-0"
+            >
+              {INITIAL_VISIBLE_COLUMNS.map((_, colIndex) => (
+                <div 
+                  key={colIndex} 
+                  className="flex-1 mr-4"
+                >
+                  <div 
+                    className={`h-4 bg-default-200 rounded animate-pulse ${
+                      colIndex === 1 ? 'w-1/2' : 'w-3/4'
+                    }`}
+                  />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+
+        {/* Skeleton Bottom Content */}
+        <div className="flex justify-between items-center mt-4">
+          <div className="w-32 h-8 bg-default-200 rounded animate-pulse" />
+          <div className="flex gap-2">
+            <div className="w-24 h-8 bg-default-200 rounded animate-pulse" />
+            <div className="w-24 h-8 bg-default-200 rounded animate-pulse" />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
