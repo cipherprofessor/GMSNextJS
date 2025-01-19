@@ -3,6 +3,7 @@ import React from "react";
 // import type { Key } from "react";
 import { Key } from "@react-types/shared";
 import axios from "axios";
+import { Search, Plus, MoreVertical, ChevronDown } from "lucide-react";
 import {
   Table,
   TableHeader,
@@ -16,11 +17,14 @@ import {
   Dropdown,
   DropdownMenu,
   DropdownItem,
-  User,
   Pagination,
   SortDescriptor,
+  Modal, 
+  ModalContent, 
+  ModalHeader, 
+  ModalBody, 
+  ModalFooter
 } from "@heroui/react";
-import { Search, Plus, MoreVertical, ChevronDown } from "lucide-react";
 
 // Define columns for visitor passes
 export const columns = [
@@ -49,6 +53,7 @@ interface VisitorPass {
 }
 
 export default function VisitorTable() {
+  // State management
   const [passes, setPasses] = React.useState<VisitorPass[]>([]);
   const [filterValue, setFilterValue] = React.useState("");
   const [selectedKeys, setSelectedKeys] = React.useState<"all" | Set<Key>>(new Set<Key>());
@@ -60,6 +65,13 @@ export default function VisitorTable() {
   });
   const [page, setPage] = React.useState(1);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [isDeleting, setIsDeleting] = React.useState<number | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = React.useState(false);
+  const [selectedPassId, setSelectedPassId] = React.useState<number | null>(null);
+  const [feedbackMessage, setFeedbackMessage] = React.useState<{
+    type: 'success' | 'error';
+    message: string;
+  } | null>(null);
 
   // Fetch passes data
   React.useEffect(() => {
@@ -69,6 +81,10 @@ export default function VisitorTable() {
         setPasses(response.data);
       } catch (error) {
         console.error('Failed to fetch passes:', error);
+        setFeedbackMessage({
+          type: 'error',
+          message: 'Failed to load passes. Please refresh the page.'
+        });
       } finally {
         setIsLoading(false);
       }
@@ -76,6 +92,43 @@ export default function VisitorTable() {
 
     fetchPasses();
   }, []);
+
+  // Delete handlers
+  const handleDeleteClick = (id: number) => {
+    setSelectedPassId(id);
+    setShowDeleteModal(true);
+  };
+
+  const handleDelete = async () => {
+    if (!selectedPassId) return;
+
+    try {
+      setIsDeleting(selectedPassId);
+      await axios.delete(`/api/delete-pass?id=${selectedPassId}`);
+      
+      setPasses(prevPasses => prevPasses.filter(pass => pass.id !== selectedPassId));
+      
+      setFeedbackMessage({
+        type: 'success',
+        message: 'The visitor pass has been successfully deleted.'
+      });
+
+      setShowDeleteModal(false);
+      
+      setTimeout(() => {
+        setFeedbackMessage(null);
+      }, 3000);
+    } catch (error) {
+      console.error('Failed to delete pass:', error);
+      setFeedbackMessage({
+        type: 'error',
+        message: 'Failed to delete the pass. Please try again.'
+      });
+    } finally {
+      setIsDeleting(null);
+      setSelectedPassId(null);
+    }
+  };
 
   const hasSearchFilter = Boolean(filterValue);
 
@@ -136,7 +189,15 @@ export default function VisitorTable() {
               <DropdownMenu>
                 <DropdownItem key="view">View</DropdownItem>
                 <DropdownItem key="edit">Edit</DropdownItem>
-                <DropdownItem key="delete">Delete</DropdownItem>
+                <DropdownItem 
+                  key="delete" 
+                  className="text-danger" 
+                  color="danger"
+                  isDisabled={isDeleting !== null}
+                  onClick={() => handleDeleteClick(pass.id)}
+                >
+                  {isDeleting === pass.id ? "Deleting..." : "Delete"}
+                </DropdownItem>
               </DropdownMenu>
             </Dropdown>
           </div>
@@ -144,9 +205,8 @@ export default function VisitorTable() {
       default:
         return cellValue;
     }
-  }, []);
+  }, [isDeleting]);
 
-  // Pagination handlers
   const onNextPage = React.useCallback(() => {
     if (page < pages) {
       setPage(page + 1);
@@ -265,40 +325,81 @@ export default function VisitorTable() {
   }
 
   return (
-    <Table
-      isHeaderSticky
-      aria-label="Visitor passes table with custom cells, pagination and sorting"
-      bottomContent={bottomContent}
-      bottomContentPlacement="outside"
-      classNames={{
-        wrapper: "max-h-[382px]",
-      }}
-      selectedKeys={selectedKeys}
-      selectionMode="multiple"
-      sortDescriptor={sortDescriptor}
-      topContent={topContent}
-      topContentPlacement="outside"
-      onSelectionChange={setSelectedKeys}
-      onSortChange={setSortDescriptor}
-    >
-      <TableHeader columns={headerColumns}>
-        {(column) => (
-          <TableColumn
-            key={column.uid}
-            align={column.uid === "actions" ? "center" : "start"}
-            allowsSorting={column.sortable}
-          >
-            {column.name}
-          </TableColumn>
-        )}
-      </TableHeader>
-      <TableBody emptyContent={"No passes found"} items={sortedItems}>
-        {(item) => (
-          <TableRow key={item.id}>
-            {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
-          </TableRow>
-        )}
-      </TableBody>
-    </Table>
+    <div className="relative">
+      {/* Feedback Message */}
+      {feedbackMessage && (
+        <div
+          className={`fixed top-4 right-4 z-50 p-4 rounded-md ${
+            feedbackMessage.type === 'success' 
+              ? 'bg-success-100 text-success-700' 
+              : 'bg-danger-100 text-danger-700'
+          }`}
+        >
+          {feedbackMessage.message}
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      <Modal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)}>
+        <ModalContent>
+          <ModalHeader className="flex flex-col gap-1">Confirm Delete</ModalHeader>
+          <ModalBody>
+            Are you sure you want to delete this visitor pass? This action cannot be undone.
+          </ModalBody>
+          <ModalFooter>
+            <Button 
+              color="default" 
+              variant="light" 
+              onPress={() => setShowDeleteModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button 
+              color="danger" 
+              onPress={handleDelete}
+              isLoading={isDeleting !== null}
+            >
+              Delete
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <Table
+        isHeaderSticky
+        aria-label="Visitor passes table with custom cells, pagination and sorting"
+        bottomContent={bottomContent}
+        bottomContentPlacement="outside"
+        classNames={{
+          wrapper: "max-h-[382px]",
+        }}
+        selectedKeys={selectedKeys}
+        selectionMode="multiple"
+        sortDescriptor={sortDescriptor}
+        topContent={topContent}
+        topContentPlacement="outside"
+        onSelectionChange={setSelectedKeys}
+        onSortChange={setSortDescriptor}
+      >
+        <TableHeader columns={headerColumns}>
+          {(column) => (
+            <TableColumn
+              key={column.uid}
+              align={column.uid === "actions" ? "center" : "start"}
+              allowsSorting={column.sortable}
+            >
+              {column.name}
+            </TableColumn>
+          )}
+        </TableHeader>
+        <TableBody emptyContent={"No passes found"} items={sortedItems}>
+          {(item) => (
+            <TableRow key={item.id}>
+              {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </div>
   );
 }
