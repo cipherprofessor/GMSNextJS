@@ -350,13 +350,13 @@ const statusColorMap: Record<string, "success" | "danger" | "warning"> = {
   vacation: "warning",
 };
 
-const INITIAL_VISIBLE_COLUMNS = ["name", "role", "status", "actions","team","email","age","id","status"];
+const INITIAL_VISIBLE_COLUMNS = ["name", "role", "status", "actions", "team", "email", "age", "id", "status"];
 
 export default function HeroUIModernTableSearch() {
   const [filterValue, setFilterValue] = React.useState("");
   const [selectedKeys, setSelectedKeys] = React.useState<"all" | Set<Key>>(new Set<Key>());
   const [visibleColumns, setVisibleColumns] = React.useState(new Set(INITIAL_VISIBLE_COLUMNS));
-  const [statusFilter, setStatusFilter] = React.useState<Set<string>>(new Set(["all"]));
+  const [statusFilter, setStatusFilter] = React.useState<Set<string>>(new Set(statusOptions.map(option => option.uid)));
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   type SortDirection = "ascending" | "descending";
   const [sortDescriptor, setSortDescriptor] = React.useState<SortDescriptor>({
@@ -378,23 +378,19 @@ export default function HeroUIModernTableSearch() {
   );
 
   const filteredItems = React.useMemo(() => {
-    
-
     if (hasSearchFilter) {
       filteredUsers = filteredUsers.filter((user) =>
-        user.name.toLowerCase().includes(filterValue.toLowerCase()),
+        user.name.toLowerCase().includes(filterValue.toLowerCase())
       );
     }
     if (Array.from(statusFilter).length !== statusOptions.length) {
       filteredUsers = filteredUsers.filter((user) =>
-        Array.from(statusFilter).includes(user.status),
+        Array.from(statusFilter).includes(user.status)
       );
     }
 
     return filteredUsers;
   }, [users, filterValue, statusFilter]);
-
-  
 
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -415,13 +411,13 @@ export default function HeroUIModernTableSearch() {
     avatar: string;
     email: string;
   };
-  
+
   const sortedItems = React.useMemo(() => {
     return [...items].sort((a, b) => {
       const first = (a as User)[sortDescriptor.column as keyof User];
       const second = (b as User)[sortDescriptor.column as keyof User];
       const cmp = first < second ? -1 : first > second ? 1 : 0;
-  
+
       return sortDescriptor.direction === "descending" ? -cmp : cmp;
     });
   }, [sortDescriptor, items]);

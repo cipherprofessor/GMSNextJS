@@ -21,12 +21,14 @@ export default function Header({ onMenuClick}: HeaderProps) {
     if (!isSignedIn) {
       return null;
     }
-    <div className="gap-x-1 lg:flex-center hidden text-black">Hello, {user.firstName} {user.lastName}</div>;
+    return <span className="text-black">Hello, {user.firstName} {user.lastName}</span>;
+
+    // <div className="gap-x-1 lg:flex-center hidden text-black">Hello, {user.firstName} {user.lastName}</div>;
   }
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-      <div className="flex items-center justify-between px-4 py-2">
+      <div className="flex items-center justify-between px-4 py-2 m-0">
         <div className="flex items-center">
           <Button variant="ghost" size="icon" className="mr-2 md:mr-4" onClick={onMenuClick}>
             <Menu className="h-6 w-6" />
@@ -50,12 +52,12 @@ export default function Header({ onMenuClick}: HeaderProps) {
             <DropdownMenuTrigger asChild>
             </DropdownMenuTrigger>
           </DropdownMenu>
-          <div className="flex-center gap-x-5">
+          <div className="flex items-center gap-x-5">
             <SignedOut>
               <Link href="/sign-in">
                 <button
                   aria-label="sign-in"
-                  className="bg-white/5 z-[999] relative px-3 py-1.5 shadow rounded-xl flex-center mr-6"
+                  className="bg-black z-[999] relative px-3 py-1.5 shadow rounded-xl flex-center mr-6 text-white"
                   style={{ marginRight: '25px' }}
                 >
                   Sign In
@@ -64,7 +66,7 @@ export default function Header({ onMenuClick}: HeaderProps) {
               <Link href="/sign-up">
                 <button
                   aria-label="sign-up"
-                  className="bg-white/5 z-[999] relative px-3 py-1.5 shadow rounded-xl flex-center mr-6"
+                  className="bg-black z-[999] relative px-3 py-1.5 shadow rounded-xl flex-center mr-6 text-white"
                   style={{ marginRight: '25px' }}
                 >
                   Sign Up

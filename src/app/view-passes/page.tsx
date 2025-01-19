@@ -187,14 +187,12 @@ export default function VisitorTable() {
                 </Button>
               </DropdownTrigger>
               <DropdownMenu>
-                <DropdownItem key="view">View</DropdownItem>
-                <DropdownItem key="edit">Edit</DropdownItem>
                 <DropdownItem 
                   key="delete" 
                   className="text-danger" 
                   color="danger"
                   isDisabled={isDeleting !== null}
-                  onClick={() => handleDeleteClick(pass.id)}
+                  onPress={() => handleDeleteClick(pass.id)}
                 >
                   {isDeleting === pass.id ? "Deleting..." : "Delete"}
                 </DropdownItem>
