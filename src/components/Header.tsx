@@ -1,11 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Menu, Leaf, Fence} from "lucide-react";
-import { 
-  DropdownMenu, 
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
-
+import { Menu, Leaf, Fence } from "lucide-react";
+import { DropdownMenu, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { SignedIn, SignedOut, UserButton, SignInButton, SignUpButton, useUser } from "@clerk/clerk-react";
 
@@ -13,7 +9,7 @@ interface HeaderProps {
   onMenuClick: () => void;
 }
 
-export default function Header({ onMenuClick}: HeaderProps) {
+export default function Header({ onMenuClick }: HeaderProps) {
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   function UserName() {
@@ -21,12 +17,12 @@ export default function Header({ onMenuClick}: HeaderProps) {
     if (!isSignedIn) {
       return null;
     }
-    <div className="gap-x-1 lg:flex-center hidden text-black">Hello, {user.firstName} {user.lastName}</div>;
+    return <span className="text-black">Hello, {user.firstName} {user.lastName}</span>;
   }
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-      <div className="flex items-center justify-between px-4 py-2">
+      <div className="flex items-center justify-between px-4 py-2 m-0">
         <div className="flex items-center">
           <Button variant="ghost" size="icon" className="mr-2 md:mr-4" onClick={onMenuClick}>
             <Menu className="h-6 w-6" />
@@ -50,7 +46,7 @@ export default function Header({ onMenuClick}: HeaderProps) {
             <DropdownMenuTrigger asChild>
             </DropdownMenuTrigger>
           </DropdownMenu>
-          <div className="flex-center gap-x-5">
+          <div className="flex items-center gap-x-5">
             <SignedOut>
               <Link href="/sign-in">
                 <button
@@ -74,9 +70,7 @@ export default function Header({ onMenuClick}: HeaderProps) {
             <SignedIn>
               <div className="flex items-center space-x-4 text-black">
                 <UserName />
-              </div>
-              <div className="flex items-center space-x-4">
-                <UserButton 
+                <UserButton
                   appearance={{
                     elements: {
                       userButtonAvatarBox: 'w-11 h-11',
