@@ -65,6 +65,7 @@ export const Transactions = pgTable("transactions", {
   date: timestamp("date").defaultNow().notNull(),
 });
 
+// VisitorsPasses table
 export const VisitorsPasses = pgTable("visitorspasses", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 100 }).notNull(),
