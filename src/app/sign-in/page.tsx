@@ -5,6 +5,8 @@ import Link from "next/link";
 import styles from "./SignInPageClerk.module.scss";
 // import { authConstants } from "../../../components/MyFigma/LoginSignupFigma/authConstants";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import Image from "next/image";
+import GatePassImage from "../../../public/GPMSLanding.png";
 
 const SignInPageClerk: React.FC = () => {
   const { isSignedIn, isLoaded } = useUser();
@@ -44,22 +46,20 @@ const SignInPageClerk: React.FC = () => {
         <div className={styles.loginrightContainer}>
           <div className={styles.loginrightText}>
             <div className={styles.logintextheading}>
-              Welcome to Login Page
+              Welcome to Gate Management System
             </div>
             <div className={styles.logintextsubheading}>
-              <p>Travel with us and explore the world</p>
+              <p>Please Login To Use The Portal</p>
             </div>
           </div>
-          <div className={styles.loginmainImageRight}>
-            <img
-              src="https://www.endeavourweigh.com/wp-content/uploads/2024/03/Rto1.png"
-              alt="MainImage"
+            <Image
+              src={GatePassImage}
+              alt="Gate Pass Management System"
               className={styles.loginmainImageRight}
             />
           </div>
         </div>
       </div>
-    </div>
   );
 };
 
