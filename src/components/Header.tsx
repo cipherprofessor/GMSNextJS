@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Menu, Leaf} from "lucide-react";
+import { Menu, Leaf, Fence} from "lucide-react";
 import { 
   DropdownMenu, 
   DropdownMenuTrigger 
@@ -32,7 +32,7 @@ export default function Header({ onMenuClick}: HeaderProps) {
             <Menu className="h-6 w-6" />
           </Button>
           <Link href="/" className="flex items-center">
-            <Leaf className="h-6 w-6 md:h-8 md:w-8 text-green-500 mr-1 md:mr-2" />
+            <Fence className="h-6 w-6 md:h-8 md:w-8 text-green-500 mr-1 md:mr-2" />
             <div className="flex flex-col">
               <span className="font-bold text-base md:text-lg text-gray-800">Gate Pass</span>
               <span className="text-[8px] md:text-[10px] text-gray-500 -mt-1">Management System</span>

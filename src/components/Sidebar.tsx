@@ -1,14 +1,13 @@
 import Link from "next/link"
 import { usePathname } from 'next/navigation'
 import { Button } from "@/components/ui/button"
-import { MapPin, Trash, Coins, Medal, Settings, Home, Car, Ticket } from "lucide-react"
+import { Ticket, LayoutDashboard, SquarePen, Users } from "lucide-react"
 
 const sidebarItems = [
-  { href: "/", icon: Home, label: "Home" },
-  { href: "/create-pass", icon: MapPin, label: "Create Pass" },
+  { href: "/", icon: LayoutDashboard, label: "Dashboard" },
+  { href: "/create-pass", icon: SquarePen, label: "Create Pass" },
   { href: "/view-passes", icon: Ticket, label: "View Passes" },
-  { href: "/staff-management", icon: Coins, label: "Staff Management" },
-  { href: "/dashboard", icon: Medal, label: "Visitors" },
+  { href: "/staff-management", icon: Users, label: "Staff Management" },
 ]
 
 interface SidebarProps {
