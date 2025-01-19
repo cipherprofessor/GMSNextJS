@@ -39,6 +39,12 @@ export default async function handler(
         )
       );
 
+    // Completed Visits (visits that have ended)
+    const completedVisits = await db
+      .select()
+      .from(VisitorsPasses)
+      .where(lte(VisitorsPasses.dateEnd, now));
+
     // Upcoming Visits
     const upcomingVisits = await db
       .select()
@@ -74,28 +80,50 @@ export default async function handler(
       .groupBy(sql`month`)
       .orderBy(sql`month ASC`);
 
-    // Hourly Distribution
-    const hourlyDistribution = await db
-      .select({
-        hour: sql`EXTRACT(HOUR FROM ${VisitorsPasses.dateStart})`.as('hour'),
-        visit_count: sql`COUNT(*)`.as('visit_count')
-      })
+    // This Week's Visits
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+    const weeklyVisits = await db
+      .select()
       .from(VisitorsPasses)
-      .groupBy(sql`hour`)
-      .orderBy(sql`hour ASC`);
+      .where(
+        and(
+          gte(VisitorsPasses.dateStart, startOfWeek),
+          lte(VisitorsPasses.dateStart, endOfWeek)
+        )
+      );
+
+    // This Month's Visits
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+    const monthlyVisits = await db
+      .select()
+      .from(VisitorsPasses)
+      .where(
+        and(
+          gte(VisitorsPasses.dateStart, startOfMonth),
+          lte(VisitorsPasses.dateStart, endOfMonth)
+        )
+      );
 
     const metrics = {
       activePasses: activePasses.length,
       todayVisitors: todayVisitors.length,
       upcomingVisits: upcomingVisits.length,
+      completedVisits: completedVisits.length,
+      weeklyVisits: weeklyVisits.length,
+      monthlyVisits: monthlyVisits.length,
       durationMetrics: {
         avg_duration: Number(durationMetrics[0].avg_duration) || 0,
         max_duration: Number(durationMetrics[0].max_duration) || 0,
         min_duration: Number(durationMetrics[0].min_duration) || 0
       },
       visitsByReason,
-      monthlyTrend,
-      hourlyDistribution
+      monthlyTrend
     };
 
     res.status(200).json(metrics);
