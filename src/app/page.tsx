@@ -1,5 +1,6 @@
 "use client"
 import React from 'react';
+import Link from 'next/link';
 import axios from 'axios';
 import ReactECharts from 'echarts-for-react';
 import * as echarts from 'echarts';
@@ -12,7 +13,8 @@ import {
   TableColumn,
   TableBody,
   TableRow,
-  TableCell
+  TableCell,
+  Button
 } from "@nextui-org/react";
 import {
   BarChart,
@@ -23,7 +25,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import { Clock, Users, Calendar, Clock8, AlertCircle } from 'lucide-react';
+import { Clock, Users, Calendar, Clock8, AlertCircle, Plus } from 'lucide-react';
 
 interface DurationMetrics {
   avg_duration: number;
@@ -158,21 +160,31 @@ export default function Dashboard() {
       <div className="w-full h-[50vh] flex flex-col items-center justify-center gap-4 p-4">
         <AlertCircle className="w-12 h-12 text-danger" />
         <p className="text-lg text-danger">{error}</p>
-        <button 
+        <Button 
           onClick={fetchMetrics}
-          className="px-4 py-2 bg-primary rounded-lg text-white hover:bg-primary-500 transition-colors"
+          color="primary"
         >
           Retry
-        </button>
+        </Button>
       </div>
     );
   }
 
   return (
     <div className="w-full min-h-screen p-4 bg-gray-50">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-default-900">Dashboard</h1>
-        <p className="text-default-500">Last updated: {new Date().toLocaleTimeString()}</p>
+      <div className="mb-6 flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-default-900">Dashboard</h1>
+          <p className="text-default-500">Last updated: {new Date().toLocaleTimeString()}</p>
+        </div>
+        <Link href="/create-pass">
+          <Button 
+            color="primary" 
+            endContent={<Plus size={20} />}
+          >
+            Add New Pass
+          </Button>
+        </Link>
       </div>
 
       {/* KPI Cards */}
