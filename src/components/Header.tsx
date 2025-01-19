@@ -55,7 +55,7 @@ export default function Header({ onMenuClick}: HeaderProps) {
               <Link href="/sign-in">
                 <button
                   aria-label="sign-in"
-                  className="bg-white/5 z-[999] relative px-3 py-1.5 shadow rounded-xl flex-center mr-6"
+                  className="bg-black z-[999] relative px-3 py-1.5 shadow rounded-xl flex-center mr-6 text-white"
                   style={{ marginRight: '25px' }}
                 >
                   Sign In
@@ -64,7 +64,7 @@ export default function Header({ onMenuClick}: HeaderProps) {
               <Link href="/sign-up">
                 <button
                   aria-label="sign-up"
-                  className="bg-white/5 z-[999] relative px-3 py-1.5 shadow rounded-xl flex-center mr-6"
+                  className="bg-black z-[999] relative px-3 py-1.5 shadow rounded-xl flex-center mr-6 text-white"
                   style={{ marginRight: '25px' }}
                 >
                   Sign Up
