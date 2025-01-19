@@ -96,6 +96,28 @@ export default async function handler(
         )
       );
 
+    // Weekly Distribution (by day of week)
+    const weeklyDistribution = await db
+      .select({
+        day: sql`EXTRACT(DOW FROM ${VisitorsPasses.dateStart})`.as('day'),
+        count: sql`COUNT(*)`.as('count')
+      })
+      .from(VisitorsPasses)
+      .where(
+        and(
+          gte(VisitorsPasses.dateStart, startOfWeek),
+          lte(VisitorsPasses.dateStart, endOfWeek)
+        )
+      )
+      .groupBy(sql`day`)
+      .orderBy(sql`day`);
+
+    // Convert to array of counts
+    const distributionArray = Array(7).fill(0);
+    weeklyDistribution.forEach(({ day, count }) => {
+      distributionArray[Number(day)] = count;
+    });
+
     // This Month's Visits
     const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
     const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
@@ -123,7 +145,8 @@ export default async function handler(
         min_duration: Number(durationMetrics[0].min_duration) || 0
       },
       visitsByReason,
-      monthlyTrend
+      monthlyTrend,
+      weeklyDistribution: distributionArray
     };
 
     res.status(200).json(metrics);
