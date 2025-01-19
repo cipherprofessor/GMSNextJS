@@ -50,7 +50,7 @@ const SignUpPageClerk: React.FC = () => {
               Welcome To SignUp Page
             </div>
             <div className={styles.signuptextsubheading}>
-              <p>Travel with us and explore the world</p>
+              <p>Create An Account To Get Started</p>
             </div>
           </div>
           <div className={styles.signupmainImageRight}>

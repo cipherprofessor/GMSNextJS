@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Menu, Leaf, Fence } from "lucide-react";
-import { DropdownMenu, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Menu, Leaf, Fence} from "lucide-react";
+import { 
+  DropdownMenu, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
+
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { SignedIn, SignedOut, UserButton, SignInButton, SignUpButton, useUser } from "@clerk/clerk-react";
 
@@ -9,7 +13,7 @@ interface HeaderProps {
   onMenuClick: () => void;
 }
 
-export default function Header({ onMenuClick }: HeaderProps) {
+export default function Header({ onMenuClick}: HeaderProps) {
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   function UserName() {
@@ -18,6 +22,8 @@ export default function Header({ onMenuClick }: HeaderProps) {
       return null;
     }
     return <span className="text-black">Hello, {user.firstName} {user.lastName}</span>;
+
+    // <div className="gap-x-1 lg:flex-center hidden text-black">Hello, {user.firstName} {user.lastName}</div>;
   }
 
   return (
@@ -70,7 +76,9 @@ export default function Header({ onMenuClick }: HeaderProps) {
             <SignedIn>
               <div className="flex items-center space-x-4 text-black">
                 <UserName />
-                <UserButton
+              </div>
+              <div className="flex items-center space-x-4">
+                <UserButton 
                   appearance={{
                     elements: {
                       userButtonAvatarBox: 'w-11 h-11',
