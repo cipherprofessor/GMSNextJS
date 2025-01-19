@@ -1,165 +1,374 @@
-// @ts-nocheck
-'use client'
-import { useState, useEffect } from 'react'
-import { ArrowRight, Leaf, Recycle, Users, Coins, MapPin, ChevronRight } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Poppins } from 'next/font/google'
-import Link from 'next/link'
-import ContractInteraction from '@/components/ContractInteraction'
-import { getRecentReports, getAllRewards, getWasteCollectionTasks } from '@/utils/db/actions'
-const poppins = Poppins({ 
-  weight: ['300', '400', '600'],
-  subsets: ['latin'],
-  display: 'swap',
-})
+"use client"
+import React from 'react';
+import axios from 'axios';
+import ReactECharts from 'echarts-for-react';
+import * as echarts from 'echarts';
+import {
+  Card,
+  CardHeader,
+  CardBody,
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell
+} from "@nextui-org/react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
+import { Clock, Users, Calendar, Clock8, AlertCircle } from 'lucide-react';
 
-
-// LOGO
-function AnimatedGlobe() {
-  return (
-    <div className="relative w-32 h-32 mx-auto mb-8">
-      <div className="absolute inset-0 rounded-full bg-green-500 opacity-20 animate-pulse"></div>
-      <div className="absolute inset-2 rounded-full bg-green-400 opacity-40 animate-ping"></div>
-      <div className="absolute inset-4 rounded-full bg-green-300 opacity-60 animate-spin"></div>
-      <div className="absolute inset-6 rounded-full bg-green-200 opacity-80 animate-bounce"></div>
-      <Leaf className="absolute inset-0 m-auto h-16 w-16 text-green-600 animate-pulse" />
-    </div>
-  )
+interface DurationMetrics {
+  avg_duration: number;
+  max_duration: number;
+  min_duration: number;
 }
 
-export default function Home() {
-  // const [loggedIn, setLoggedIn] = useState(false);
-  const [impactData, setImpactData] = useState({
-    wasteCollected: 25,
-    reportsSubmitted: 126,
-    tokensEarned: 600,
-    co2Offset: 10
-  });
+interface VisitReason {
+  reason: string;
+  count: number;
+}
 
+interface MonthlyTrend {
+  month: string;
+  visit_count: number;
+}
+
+interface DashboardMetrics {
+  activePasses: number;
+  todayVisitors: number;
+  upcomingVisits: number;
+  completedVisits: number;
+  weeklyVisits: number;
+  monthlyVisits: number;
+  durationMetrics: DurationMetrics;
+  visitsByReason: VisitReason[];
+  monthlyTrend: MonthlyTrend[];
+  weeklyDistribution: number[];
+}
+
+const REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes
+const CHART_COLORS = {
+  primary: '#06b6d4',
+  success: '#10b981',
+  warning: '#f59e0b',
+  error: '#ef4444',
+  purple: '#8884d8',
+  blue: '#0ea5e9',
+};
+
+const formatDuration = (hours: number) => {
+  const days = Math.floor(hours / 24);
+  const remainingHours = Math.floor(hours % 24);
   
+  if (days > 0) {
+    return `${days}d ${remainingHours}h`;
+  }
+  return `${remainingHours}h`;
+};
 
-  useEffect(() => {
-    async function fetchImpactData() {
-      try {
-        const reports = await getRecentReports(100);  // Fetch last 100 reports
-        const rewards = await getAllRewards();
-        const tasks = await getWasteCollectionTasks(100);  // Fetch last 100 tasks
-
-        const wasteCollected = tasks.reduce((total, task) => {
-          const match = task.amount.match(/(\d+(\.\d+)?)/);
-          const amount = match ? parseFloat(match[0]) : 0;
-          return total + amount;
-        }, 0);
-
-        const reportsSubmitted = reports.length;
-        const tokensEarned = rewards.reduce((total, reward) => total + (reward.points || 0), 0);
-        const co2Offset = wasteCollected * 0.5;  // Assuming 0.5 kg CO2 offset per kg of waste
-
-        setImpactData({
-          wasteCollected: Math.round(wasteCollected * 10) / 10, // Round to 1 decimal place
-          reportsSubmitted,
-          tokensEarned,
-          co2Offset: Math.round(co2Offset * 10) / 10 // Round to 1 decimal place
-        });
-      } catch (error) {
-        console.error("Error fetching impact data:", error);
-        // Set default values in case of error
-        setImpactData({
-          wasteCollected: 0,
-          reportsSubmitted: 0,
-          tokensEarned: 0,
-          co2Offset: 0
-        });
+const getVisitStatusDonutOptions = (metrics: DashboardMetrics | null): any => {
+  if (!metrics) return { series: [] };
+  
+  return {
+    tooltip: {
+      trigger: 'item',
+      formatter: '{a} <br/>{b}: {c} ({d}%)'
+    },
+    legend: {
+      orient: 'vertical',
+      right: 10,
+      top: 'center'
+    },
+    series: [
+      {
+        name: 'Visit Status',
+        type: 'pie',
+        radius: ['40%', '70%'],
+        avoidLabelOverlap: false,
+        itemStyle: {
+          borderRadius: 10,
+          borderColor: '#fff',
+          borderWidth: 2
+        },
+        label: {
+          show: false,
+        },
+        emphasis: {
+          label: {
+            show: true,
+            fontSize: 14,
+            fontWeight: 'bold'
+          }
+        },
+        color: [CHART_COLORS.primary, CHART_COLORS.warning, CHART_COLORS.success],
+        data: [
+          { value: metrics.activePasses, name: 'Active' },
+          { value: metrics.upcomingVisits, name: 'Upcoming' },
+          { value: metrics.completedVisits, name: 'Completed' }
+        ]
       }
-    }
+    ]
+  };
+};
 
-    fetchImpactData();
+export default function Dashboard() {
+  const [metrics, setMetrics] = React.useState<DashboardMetrics | null>(null);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
+
+  const fetchMetrics = React.useCallback(async () => {
+    try {
+      setError(null);
+      const response = await axios.get('/api/dashboard-metrics');
+      setMetrics(response.data);
+    } catch (error) {
+      console.error('Failed to fetch metrics:', error);
+      setError('Failed to load dashboard data. Please try again later.');
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  const login = () => {
-    setLoggedIn(true);
-  };
+  React.useEffect(() => {
+    fetchMetrics();
+    const intervalId = setInterval(fetchMetrics, REFRESH_INTERVAL);
+    return () => clearInterval(intervalId);
+  }, [fetchMetrics]);
 
-  return (
-    <div className={`container mx-auto px-4 py-1 ${poppins.className}`}>
-      <section className="text-center mb-20">
-        <AnimatedGlobe />
-        <h1 className="text-2xl font-bold mb-6 text-gray-800 tracking-tight">
-          Gate Pass <span className="text-green-600">Management System</span>
-        </h1>
-        <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed mb-8">
-          Here we can manage the gate pass system for the visitors and the employees.
-        </p>
-        {/* {!loggedIn ? (
-          <Button onClick={login} className="bg-green-600 hover:bg-green-700 text-white text-lg py-6 px-10 rounded-full font-medium transition-all duration-300 ease-in-out transform hover:scale-105">
-            Get Started
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
-        ) : (
-          <Link href="/report">
-            <Button className="bg-green-600 hover:bg-green-700 text-white text-lg py-6 px-10 rounded-full font-medium transition-all duration-300 ease-in-out transform hover:scale-105">
-              Create A Pass
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-          </Link>
-        )} */}
-      </section>
-      
-      
-      
-      <section className="bg-white p-10 rounded-3xl shadow-lg mb-20">
-        <h2 className="text-4xl font-bold mb-12 text-center text-gray-800">Dashboard</h2>
-        <div className="grid md:grid-cols-4 gap-6">
-          <ImpactCard title="Active Passes" value={`${impactData.wasteCollected} `} icon={Recycle} />
-          <ImpactCard title="Visitors Today" value={impactData.reportsSubmitted.toString()} icon={MapPin} />
-          <ImpactCard title="Total Passes" value={impactData.tokensEarned.toString()} icon={Coins} />
-          <ImpactCard title="Pending Passes" value={`${impactData.co2Offset} `} icon={Leaf} />
-        </div>
-      </section>
-
-      <section className="grid md:grid-cols-3 gap-10 mb-20">
-        <FeatureCard
-          icon={Leaf}
-          title="Easy To Use"
-          description="Simple and intuitive interface for creating and managing gate passes."
-        />
-        <FeatureCard
-          icon={Coins}
-          title="Track Costs"
-          description="Monitor and analyze costs associated with gate pass management."
-        />
-        <FeatureCard
-          icon={Users}
-          title="People Management"
-          description="Manage visitors and employees with ease and efficiency."
-        />
-      </section>
-
-   
-    </div>
-  )
-}
-
-function ImpactCard({ title, value, icon: Icon }: { title: string; value: string | number; icon: React.ElementType }) {
-  const formattedValue = typeof value === 'number' ? value.toLocaleString('en-US', { maximumFractionDigits: 1 }) : value;
-  
-  return (
-    <div className="p-6 rounded-xl bg-gray-50 border border-gray-100 transition-all duration-300 ease-in-out hover:shadow-md">
-      <Icon className="h-10 w-10 text-green-500 mb-4" />
-      <p className="text-3xl font-bold mb-2 text-gray-800">{formattedValue}</p>
-      <p className="text-sm text-gray-600">{title}</p>
-    </div>
-  )
-}
-
-function FeatureCard({ icon: Icon, title, description }: { icon: React.ElementType; title: string; description: string }) {
-  return (
-    <div className="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 ease-in-out flex flex-col items-center text-center">
-      <div className="bg-green-100 p-4 rounded-full mb-6">
-        <Icon className="h-8 w-8 text-green-600" />
+  if (isLoading) {
+    return (
+      <div className="w-full min-h-screen grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
+        {[...Array(8)].map((_, i) => (
+          <div key={i} className="h-[200px] bg-default-200 rounded-lg animate-pulse" />
+        ))}
       </div>
-      <h3 className="text-xl font-semibold mb-4 text-gray-800">{title}</h3>
-      <p className="text-gray-600 leading-relaxed">{description}</p>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-full h-[50vh] flex flex-col items-center justify-center gap-4 p-4">
+        <AlertCircle className="w-12 h-12 text-danger" />
+        <p className="text-lg text-danger">{error}</p>
+        <button 
+          onClick={fetchMetrics}
+          className="px-4 py-2 bg-primary rounded-lg text-white hover:bg-primary-500 transition-colors"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full min-h-screen p-4 bg-gray-50">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-default-900">Dashboard</h1>
+        <p className="text-default-500">Last updated: {new Date().toLocaleTimeString()}</p>
+      </div>
+
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <Card className="transition-all duration-300 hover:scale-105 hover:shadow-lg">
+          <CardBody className="flex items-center gap-4">
+            <div className="p-3 bg-primary-100 rounded-full">
+              <Users className="w-6 h-6 text-primary-500" />
+            </div>
+            <div>
+              <p className="text-sm text-default-500">Active Passes</p>
+              <h3 className="text-2xl font-bold">{metrics?.activePasses ?? 0}</h3>
+            </div>
+          </CardBody>
+        </Card>
+
+        <Card className="transition-all duration-300 hover:scale-105 hover:shadow-lg">
+          <CardBody className="flex items-center gap-4">
+            <div className="p-3 bg-success-100 rounded-full">
+              <Calendar className="w-6 h-6 text-success-500" />
+            </div>
+            <div>
+              <p className="text-sm text-default-500">This Week's Visits</p>
+              <h3 className="text-2xl font-bold">{metrics?.weeklyVisits ?? 0}</h3>
+            </div>
+          </CardBody>
+        </Card>
+
+        <Card className="transition-all duration-300 hover:scale-105 hover:shadow-lg">
+          <CardBody className="flex items-center gap-4">
+            <div className="p-3 bg-warning-100 rounded-full">
+              <Calendar className="w-6 h-6 text-warning-500" />
+            </div>
+            <div>
+              <p className="text-sm text-default-500">This Month's Visits</p>
+              <h3 className="text-2xl font-bold">{metrics?.monthlyVisits ?? 0}</h3>
+            </div>
+          </CardBody>
+        </Card>
+
+        <Card className="transition-all duration-300 hover:scale-105 hover:shadow-lg">
+          <CardBody className="flex items-center gap-4">
+            <div className="p-3 bg-secondary-100 rounded-full">
+              <Clock8 className="w-6 h-6 text-secondary-500" />
+            </div>
+            <div>
+              <p className="text-sm text-default-500">Avg Duration</p>
+              <h3 className="text-2xl font-bold">
+                {formatDuration(metrics?.durationMetrics.avg_duration ?? 0)}
+              </h3>
+            </div>
+          </CardBody>
+        </Card>
+      </div>
+
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Monthly Trend */}
+        <Card className="w-full transition-all duration-300 hover:shadow-lg">
+          <CardHeader>Monthly Visit Trends</CardHeader>
+          <CardBody>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={metrics?.monthlyTrend ?? []}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="month" 
+                    tickFormatter={(value) => new Date(value).toLocaleDateString('default', { month: 'short' })}
+                  />
+                  <YAxis />
+                  <Tooltip 
+                    cursor={{ fill: 'rgba(0, 0, 0, 0.1)' }}
+                    content={({ active, payload, label }) => {
+                      if (active && payload && payload.length) {
+                        return (
+                          <div className="bg-white p-3 rounded-lg shadow-lg border">
+                            <p className="font-bold text-default-700">
+                              {new Date(label).toLocaleDateString('default', { month: 'long', year: 'numeric' })}
+                            </p>
+                            <p className="text-primary-500">
+                              Total Visits: {payload[0].value}
+                            </p>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                  <Bar 
+                    dataKey="visit_count" 
+                    fill={CHART_COLORS.primary}
+                    radius={[4, 4, 0, 0]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardBody>
+        </Card>
+
+        {/* Visit Status Distribution */}
+        <Card className="w-full transition-all duration-300 hover:shadow-lg">
+          <CardHeader>Visit Status Distribution</CardHeader>
+          <CardBody>
+            <div className="h-[300px]">
+              <ReactECharts 
+                option={getVisitStatusDonutOptions(metrics)}
+                style={{ height: '100%' }} 
+                notMerge={true}
+              />
+            </div>
+          </CardBody>
+        </Card>
+
+        {/* Weekly Visit Distribution */}
+        <Card className="w-full transition-all duration-300 hover:shadow-lg">
+          <CardHeader>Weekly Visit Distribution</CardHeader>
+          <CardBody>
+            <div className="h-[300px]">
+              <ReactECharts 
+                option={{
+                  tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                      type: 'shadow'
+                    }
+                  },
+                  grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                  },
+                  xAxis: {
+                    type: 'category',
+                    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    axisTick: {
+                      alignWithLabel: true
+                    }
+                  },
+                  yAxis: {
+                    type: 'value'
+                  },
+                  series: [
+                    {
+                      name: 'Visits',
+                      type: 'bar',
+                      barWidth: '60%',
+                      data: metrics?.weeklyDistribution ?? [],
+                      itemStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                          { offset: 0, color: CHART_COLORS.blue },
+                          { offset: 1, color: CHART_COLORS.primary }
+                        ])
+                      }
+                    }
+                  ]
+                }}
+                style={{ height: '100%' }} 
+                notMerge={true}
+              />
+            </div>
+          </CardBody>
+        </Card>
+
+        {/* Top Visit Reasons Table */}
+        <Card className="w-full transition-all duration-300 hover:shadow-lg">
+          <CardHeader>Top Visit Reasons</CardHeader>
+          <CardBody>
+            <Table aria-label="Visit reasons table">
+              <TableHeader>
+                <TableColumn>REASON</TableColumn>
+                <TableColumn>COUNT</TableColumn>
+                <TableColumn>PERCENTAGE</TableColumn>
+              </TableHeader>
+              <TableBody>
+                {metrics ? metrics.visitsByReason.map((item: VisitReason, index: number) => {
+                  const total = metrics.visitsByReason.reduce((acc: number, curr: VisitReason) => acc + curr.count, 0);
+                  return (
+                    <TableRow key={index}>
+                      <TableCell>{item.reason}</TableCell>
+                      <TableCell>{item.count}</TableCell>
+                      <TableCell>
+                        {((item.count / total) * 100).toFixed(1)}%
+                      </TableCell>
+                    </TableRow>
+                  );
+                }) : (
+                  <TableRow>
+                    <TableCell>No data available</TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </CardBody>
+        </Card>
+      </div>
     </div>
-  )
+  );
 }
